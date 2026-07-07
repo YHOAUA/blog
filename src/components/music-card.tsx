@@ -1,21 +1,27 @@
+/**
+ * [INPUT]: 依赖 @/components/card, @/hooks/use-center, @/app/(home)/stores/config-store, @/app/music/music-store
+ * [OUTPUT]: 对外提供 MusicCard 组件（首页音乐卡片）
+ * [POS]: components 的音乐入口组件，单击跳转全屏播放页
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
+
 'use client'
 
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import Card from '@/components/card'
 import { useCenterStore } from '@/hooks/use-center'
 import { useConfigStore } from '../app/(home)/stores/config-store'
 import { CARD_SPACING } from '@/consts'
 import MusicSVG from '@/svgs/music.svg'
-import PlaySVG from '@/svgs/play.svg'
 import { HomeDraggableLayer } from '../app/(home)/home-draggable-layer'
 import { Pause } from 'lucide-react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import clsx from 'clsx'
-
-const MUSIC_FILES = ['/music/close-to-you.mp3']
+import { useMusicStore } from '@/app/music/music-store'
 
 export default function MusicCard() {
 	const pathname = usePathname()
+	const router = useRouter()
 	const center = useCenterStore()
 	const { cardStyles, siteContent } = useConfigStore()
 	const styles = cardStyles.musicCard
@@ -23,16 +29,23 @@ export default function MusicCard() {
 	const clockCardStyles = cardStyles.clockCard
 	const calendarCardStyles = cardStyles.calendarCard
 
-	const [isPlaying, setIsPlaying] = useState(false)
-	const [currentIndex, setCurrentIndex] = useState(0)
-	const [progress, setProgress] = useState(0)
-	const audioRef = useRef<HTMLAudioElement | null>(null)
-	const currentIndexRef = useRef(0)
+	const { isPlaying, progress, playlist, currentIndex, init, initialized } = useMusicStore()
 
 	const isHomePage = pathname === '/'
 
+	useEffect(() => {
+		if (!initialized) {
+			init()
+		}
+	}, [initialized, init])
+
+	const currentTrack = playlist[currentIndex]
+
+	const handleClick = () => {
+		router.push('/music')
+	}
+
 	const position = useMemo(() => {
-		// If not on home page, always position at bottom-right corner when playing
 		if (!isHomePage) {
 			return {
 				x: center.width - styles.width - 16,
@@ -40,7 +53,6 @@ export default function MusicCard() {
 			}
 		}
 
-		// Default position on home page
 		return {
 			x: styles.offsetX !== null ? center.x + styles.offsetX : center.x + CARD_SPACING + hiCardStyles.width / 2 - styles.offset,
 			y: styles.offsetY !== null ? center.y + styles.offsetY : center.y - clockCardStyles.offset + CARD_SPACING + calendarCardStyles.height + CARD_SPACING
@@ -49,95 +61,20 @@ export default function MusicCard() {
 
 	const { x, y } = position
 
-	// Initialize audio element
-	useEffect(() => {
-		if (!audioRef.current) {
-			audioRef.current = new Audio()
-		}
-
-		const audio = audioRef.current
-
-		const updateProgress = () => {
-			if (audio.duration) {
-				setProgress((audio.currentTime / audio.duration) * 100)
-			}
-		}
-
-		const handleEnded = () => {
-			const nextIndex = (currentIndexRef.current + 1) % MUSIC_FILES.length
-			currentIndexRef.current = nextIndex
-			setCurrentIndex(nextIndex)
-			setProgress(0)
-		}
-
-		const handleTimeUpdate = () => {
-			updateProgress()
-		}
-
-		const handleLoadedMetadata = () => {
-			updateProgress()
-		}
-
-		audio.addEventListener('timeupdate', handleTimeUpdate)
-		audio.addEventListener('ended', handleEnded)
-		audio.addEventListener('loadedmetadata', handleLoadedMetadata)
-
-		return () => {
-			audio.removeEventListener('timeupdate', handleTimeUpdate)
-			audio.removeEventListener('ended', handleEnded)
-			audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
-		}
-	}, [])
-
-	// Handle currentIndex change - load new audio
-	useEffect(() => {
-		currentIndexRef.current = currentIndex
-		if (audioRef.current) {
-			const wasPlaying = !audioRef.current.paused
-			audioRef.current.pause()
-			audioRef.current.src = MUSIC_FILES[currentIndex]
-			audioRef.current.loop = false
-			setProgress(0)
-
-			if (wasPlaying) {
-				audioRef.current.play().catch(console.error)
-			}
-		}
-	}, [currentIndex])
-
-	// Handle play/pause state change
-	useEffect(() => {
-		if (!audioRef.current) return
-
-		if (isPlaying) {
-			audioRef.current.play().catch(console.error)
-		} else {
-			audioRef.current.pause()
-		}
-	}, [isPlaying])
-
-	// Cleanup on unmount
-	useEffect(() => {
-		return () => {
-			if (audioRef.current) {
-				audioRef.current.pause()
-				audioRef.current.src = ''
-			}
-		}
-	}, [])
-
-	const togglePlayPause = () => {
-		setIsPlaying(!isPlaying)
-	}
-
-	// Hide component if not on home page and not playing
 	if (!isHomePage && !isPlaying) {
 		return null
 	}
 
 	return (
 		<HomeDraggableLayer cardKey='musicCard' x={x} y={y} width={styles.width} height={styles.height}>
-			<Card order={styles.order} width={styles.width} height={styles.height} x={x} y={y} className={clsx('flex items-center gap-3', !isHomePage && 'fixed')}>
+			<Card
+				order={styles.order}
+				width={styles.width}
+				height={styles.height}
+				x={x}
+				y={y}
+				className={clsx('flex cursor-pointer items-center gap-3', !isHomePage && 'fixed')}
+				onClick={handleClick}>
 				{siteContent.enableChristmas && (
 					<>
 						<img
@@ -157,17 +94,17 @@ export default function MusicCard() {
 
 				<MusicSVG className='h-8 w-8' />
 
-				<div className='flex-1'>
-					<div className='text-secondary text-sm'>Close To You</div>
+				<div className='flex-1 min-w-0'>
+					<div className='text-secondary truncate text-sm'>{currentTrack?.name || 'Music'}</div>
 
 					<div className='mt-1 h-2 rounded-full bg-white/60'>
 						<div className='bg-linear h-full rounded-full transition-all duration-300' style={{ width: `${progress}%` }} />
 					</div>
 				</div>
 
-				<button onClick={togglePlayPause} className='flex h-10 w-10 items-center justify-center rounded-full bg-white transition-opacity hover:opacity-80'>
-					{isPlaying ? <Pause className='text-brand h-4 w-4' /> : <PlaySVG className='text-brand ml-1 h-4 w-4' />}
-				</button>
+				<div className='flex h-10 w-10 items-center justify-center rounded-full bg-white'>
+					{isPlaying && <Pause className='text-brand h-4 w-4' />}
+				</div>
 			</Card>
 		</HomeDraggableLayer>
 	)
