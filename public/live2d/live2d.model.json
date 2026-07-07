@@ -1,0 +1,33 @@
+{
+	"version": "Live2D MoePet v1.1",
+	"name": "remu",
+	"model": "remu.moc",
+	"textures": [
+		"remu2048/texture_00.png"
+	],
+	"physics": "remu.physics.json",
+	"pose": "remu.pose.json",
+	"layout": {
+		"center_x": 0.0,
+		"center_y": -0.05,
+		"width": 2.0
+	},
+	"hit_areas": [
+		{"name": "head", "id": "D_REF.PT_HEAD"},
+		{"name": "body", "id": "D_REF.PT_BODY"}
+	],
+	"motions": {
+		"idle": [
+			{"file": "motions/Live2D_remu_idle.mtn"}
+		],
+		"tap_head": [
+			{"file": "motions/Live2D_remu01.mtn"},
+			{"file": "motions/Live2D_remu02.mtn"},
+			{"file": "motions/Live2D_remu03.mtn"}
+		],
+		"tap_body": [
+			{"file": "motions/Live2D_remu04.mtn"},
+			{"file": "motions/Live2D_remu05.mtn"}
+		]
+	}
+}

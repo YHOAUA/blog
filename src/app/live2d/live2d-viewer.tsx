@@ -19,11 +19,11 @@ interface Live2DModelInstance {
 
 const CDN_SCRIPTS = [
 	'https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.2.0/browser/pixi.min.js',
-	'https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js',
-	'https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/cubism4.min.js'
+	'https://cdn.jsdelivr.net/gh/dylanNew/live2d/webgl/Live2D/lib/live2d.min.js',
+	'https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/cubism2.min.js'
 ]
 
-const MODEL_URL = '/live2d/live2d.model3.json'
+const MODEL_URL = '/live2d/live2d.model.json'
 
 function loadScript(src: string): Promise<void> {
 	return new Promise((resolve, reject) => {
