@@ -5,18 +5,19 @@ import StarRating from '@/components/star-rating'
 import { useSize } from '@/hooks/use-size'
 import { cn } from '@/lib/utils'
 import EditableStarRating from '@/components/editable-star-rating'
-import { Blogger, type BloggerStatus } from '../grid-view'
+import { Blogger } from '../grid-view'
 import { useState } from 'react'
 import AvatarUploadDialog, { type AvatarItem } from './avatar-upload-dialog'
 
 interface BloggerCardProps {
 	blogger: Blogger
+	categories: string[]
 	isEditMode?: boolean
 	onUpdate?: (blogger: Blogger, oldBlogger: Blogger, avatarItem?: AvatarItem) => void
 	onDelete?: () => void
 }
 
-export function BloggerCard({ blogger, isEditMode = false, onUpdate, onDelete }: BloggerCardProps) {
+export function BloggerCard({ blogger, categories, isEditMode = false, onUpdate, onDelete }: BloggerCardProps) {
 	const [expanded, setExpanded] = useState(false)
 	const [isEditing, setIsEditing] = useState(false)
 	const { maxSM } = useSize()
@@ -125,16 +126,24 @@ export function BloggerCard({ blogger, isEditMode = false, onUpdate, onDelete }:
 				)}
 
 				{canEdit && (
-					<div className='mt-2 flex gap-2'>
-						{(['recent', 'disconnected'] as BloggerStatus[]).map(status => (
+					<div className='mt-2 flex flex-wrap gap-2'>
+						<button
+							type='button'
+							onClick={() => handleFieldChange('category', undefined)}
+							className={`rounded-full px-3 py-1 text-xs transition-colors ${
+								!localBlogger.category ? 'bg-brand text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+							}`}>
+							未分类
+						</button>
+						{categories.map(cat => (
 							<button
-								key={status}
+								key={cat}
 								type='button'
-								onClick={() => handleFieldChange('status', status)}
+								onClick={() => handleFieldChange('category', cat)}
 								className={`rounded-full px-3 py-1 text-xs transition-colors ${
-									(localBlogger.status ?? 'recent') === status ? 'bg-brand text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+									localBlogger.category === cat ? 'bg-brand text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
 								}`}>
-								{status === 'recent' ? '近期更新' : '长期失联'}
+								{cat}
 							</button>
 						))}
 					</div>

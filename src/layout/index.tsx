@@ -9,6 +9,7 @@ import { useSize, useSizeInit } from '@/hooks/use-size'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { ScrollTopButton } from '@/components/scroll-top-button'
 import MusicCard from '@/components/music-card'
+import MusicMiniBar from '@/components/music-mini-bar'
 
 export default function Layout({ children }: PropsWithChildren) {
 	useCenterInit()
@@ -59,7 +60,8 @@ export default function Layout({ children }: PropsWithChildren) {
 				{!maxSM && cardStyles.musicCard?.enabled !== false && <MusicCard />}
 			</main>
 
-			{maxSM && init && <ScrollTopButton className='bg-brand/20 fixed right-6 bottom-8 z-50 shadow-md' />}
+			{maxSM && init && <ScrollTopButton className='bg-brand/20 fixed right-6 bottom-20 z-50 shadow-md' />}
+			{maxSM && init && cardStyles.musicCard?.enabled !== false && <MusicMiniBar />}
 		</>
 	)
 }

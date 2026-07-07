@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion } from 'motion/react'
 import { toast } from 'sonner'
 import GridView, { type Blogger } from './grid-view'
@@ -9,7 +9,9 @@ import { pushBloggers } from './services/push-bloggers'
 import { useAuthStore } from '@/hooks/use-auth'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 import initialList from './list.json'
+import initialCategories from './categories.json'
 import type { AvatarItem } from './components/avatar-upload-dialog'
+import { BloggerCategoryModal } from './components/category-modal'
 
 export default function Page() {
 	const [bloggers, setBloggers] = useState<Blogger[]>(initialList as Blogger[])
@@ -19,6 +21,10 @@ export default function Page() {
 	const [editingBlogger, setEditingBlogger] = useState<Blogger | null>(null)
 	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 	const [avatarItems, setAvatarItems] = useState<Map<string, AvatarItem>>(new Map())
+	const [categoryList, setCategoryList] = useState<string[]>(initialCategories)
+	const [originalCategoryList, setOriginalCategoryList] = useState<string[]>(initialCategories)
+	const [newCategory, setNewCategory] = useState('')
+	const [categoryModalOpen, setCategoryModalOpen] = useState(false)
 	const keyInputRef = useRef<HTMLInputElement>(null)
 
 	const { isAuth, setPrivateKey } = useAuthStore()
@@ -56,11 +62,40 @@ export default function Page() {
 		}
 	}
 
+	const handleAddCategory = useCallback(() => {
+		const value = newCategory.trim()
+		if (!value) {
+			toast.info('请输入分类名称')
+			return
+		}
+		setCategoryList(prev => (prev.includes(value) ? prev : [...prev, value]))
+		setNewCategory('')
+	}, [newCategory])
+
+	const handleRemoveCategory = useCallback((category: string) => {
+		setCategoryList(prev => prev.filter(item => item !== category))
+		setBloggers(prev => prev.map(b => (b.category === category ? { ...b, category: undefined } : b)))
+	}, [])
+
+	const handleReorderCategories = useCallback((nextList: string[]) => {
+		setCategoryList(nextList)
+	}, [])
+
+	const handleAssignCategory = useCallback((url: string, category?: string) => {
+		setBloggers(prev =>
+			prev.map(b => {
+				if (b.url !== url) return b
+				const nextCategory = category?.trim()
+				if (!nextCategory) return { ...b, category: undefined }
+				return { ...b, category: nextCategory }
+			})
+		)
+	}, [])
+
 	const handleChoosePrivateKey = async (file: File) => {
 		try {
 			const text = await file.text()
 			setPrivateKey(text)
-			// 选择文件后自动保存
 			await handleSave()
 		} catch (error) {
 			console.error('Failed to read private key:', error)
@@ -82,10 +117,12 @@ export default function Page() {
 		try {
 			await pushBloggers({
 				bloggers,
-				avatarItems
+				avatarItems,
+				categories: categoryList
 			})
 
 			setOriginalBloggers(bloggers)
+			setOriginalCategoryList(categoryList)
 			setAvatarItems(new Map())
 			setIsEditMode(false)
 			toast.success('保存成功！')
@@ -99,6 +136,7 @@ export default function Page() {
 
 	const handleCancel = () => {
 		setBloggers(originalBloggers)
+		setCategoryList(originalCategoryList)
 		setAvatarItems(new Map())
 		setIsEditMode(false)
 	}
@@ -133,11 +171,25 @@ export default function Page() {
 				}}
 			/>
 
-			<GridView bloggers={bloggers} isEditMode={isEditMode} onUpdate={handleUpdate} onDelete={handleDelete} />
+			<GridView
+				bloggers={bloggers}
+				categories={categoryList}
+				isEditMode={isEditMode}
+				onUpdate={handleUpdate}
+				onDelete={handleDelete}
+			/>
 
 			<motion.div initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} className='absolute top-4 right-6 flex gap-3 max-sm:hidden'>
 				{isEditMode ? (
 					<>
+						<motion.button
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={() => setCategoryModalOpen(true)}
+							disabled={isSaving}
+							className='rounded-xl border bg-white/60 px-6 py-2 text-sm transition-colors hover:bg-white/80'>
+							分类
+						</motion.button>
 						<motion.button
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
@@ -171,6 +223,19 @@ export default function Page() {
 			</motion.div>
 
 			{isCreateDialogOpen && <CreateDialog blogger={editingBlogger} onClose={() => setIsCreateDialogOpen(false)} onSave={handleSaveBlogger} />}
+
+			<BloggerCategoryModal
+				open={categoryModalOpen}
+				onClose={() => setCategoryModalOpen(false)}
+				categoryList={categoryList}
+				newCategory={newCategory}
+				onNewCategoryChange={setNewCategory}
+				onAddCategory={handleAddCategory}
+				onRemoveCategory={handleRemoveCategory}
+				onReorderCategories={handleReorderCategories}
+				bloggers={bloggers}
+				onAssignCategory={handleAssignCategory}
+			/>
 		</>
 	)
 }

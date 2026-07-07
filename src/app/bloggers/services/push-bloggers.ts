@@ -10,10 +10,11 @@ import { toast } from 'sonner'
 export type PushBloggersParams = {
 	bloggers: Blogger[]
 	avatarItems?: Map<string, AvatarItem>
+	categories?: string[]
 }
 
 export async function pushBloggers(params: PushBloggersParams): Promise<void> {
-	const { bloggers, avatarItems } = params
+	const { bloggers, avatarItems, categories } = params
 
 	// 获取认证 token（自动从全局认证状态获取）
 	const token = await getAuthToken()
@@ -68,6 +69,18 @@ export async function pushBloggers(params: PushBloggersParams): Promise<void> {
 		type: 'blob',
 		sha: bloggersBlob.sha
 	})
+
+	// Create blob for categories.json
+	if (categories) {
+		const categoriesJson = JSON.stringify(categories, null, '\t')
+		const categoriesBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(categoriesJson), 'base64')
+		treeItems.push({
+			path: 'src/app/bloggers/categories.json',
+			mode: '100644',
+			type: 'blob',
+			sha: categoriesBlob.sha
+		})
+	}
 
 	// Create tree
 	toast.info('正在创建文件树...')
