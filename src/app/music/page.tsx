@@ -58,20 +58,14 @@ export default function MusicPage() {
 	}, [currentTrack?.pic])
 
 	return (
-		<div className='relative min-h-screen px-6 pt-32 pb-12 text-sm max-sm:pt-28'>
-			<div className='mx-auto flex max-w-2xl flex-col gap-6'>
+		<div className='relative flex min-h-screen items-center justify-center px-6 py-12 text-sm'>
+			<div className='flex w-full max-w-2xl flex-col gap-6'>
 				{/* 返回 */}
 				<motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: INIT_DELAY }}>
 					<button onClick={() => router.back()} className='text-secondary inline-flex items-center gap-2 transition-colors hover:text-black'>
 						<ArrowLeft className='h-4 w-4' />
 						<span>返回</span>
 					</button>
-				</motion.div>
-
-				{/* 标题 */}
-				<motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: INIT_DELAY }} className='space-y-2 text-center'>
-					<p className='text-secondary text-xs uppercase tracking-[0.2em]'>Music Player</p>
-					<h1 className='text-2xl font-semibold'>正在播放</h1>
 				</motion.div>
 
 				{/* 主播放器卡片 */}

@@ -6,7 +6,6 @@ import { useCenterStore } from '@/hooks/use-center'
 import { useConfigStore } from './stores/config-store'
 import { CARD_SPACING } from '@/consts'
 import shareList from '@/app/share/list.json'
-import Link from 'next/link'
 import { HomeDraggableLayer } from './home-draggable-layer'
 
 type ShareItem = {
@@ -54,7 +53,7 @@ export default function ShareCard() {
 
 				<h2 className='text-secondary text-sm'>随机推荐</h2>
 
-				<Link href='/share' className='mt-2 block space-y-2'>
+				<a href={randomItem.url} target='_blank' rel='noopener noreferrer' className='mt-2 block space-y-2'>
 					<div className='flex items-center'>
 						<div className='relative mr-3 h-12 w-12 shrink-0 overflow-hidden rounded-xl'>
 							<img src={randomItem.logo} alt={randomItem.name} className='h-full w-full object-contain' />
@@ -63,7 +62,7 @@ export default function ShareCard() {
 					</div>
 
 					<p className='text-secondary line-clamp-3 text-xs'>{randomItem.description}</p>
-				</Link>
+				</a>
 			</Card>
 		</HomeDraggableLayer>
 	)

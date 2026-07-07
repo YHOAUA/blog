@@ -13,6 +13,7 @@ import { useCenterStore } from '@/hooks/use-center'
 import { useConfigStore } from '../app/(home)/stores/config-store'
 import { CARD_SPACING } from '@/consts'
 import MusicSVG from '@/svgs/music.svg'
+import PlaySVG from '@/svgs/play.svg'
 import { HomeDraggableLayer } from '../app/(home)/home-draggable-layer'
 import { Pause } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
@@ -29,7 +30,7 @@ export default function MusicCard() {
 	const clockCardStyles = cardStyles.clockCard
 	const calendarCardStyles = cardStyles.calendarCard
 
-	const { isPlaying, progress, playlist, currentIndex, init, initialized } = useMusicStore()
+	const { isPlaying, progress, playlist, currentIndex, togglePlay, init, initialized } = useMusicStore()
 
 	const isHomePage = pathname === '/'
 
@@ -43,6 +44,11 @@ export default function MusicCard() {
 
 	const handleClick = () => {
 		router.push('/music')
+	}
+
+	const handlePlayClick = (e: React.MouseEvent) => {
+		e.stopPropagation()
+		togglePlay()
 	}
 
 	const position = useMemo(() => {
@@ -102,9 +108,9 @@ export default function MusicCard() {
 					</div>
 				</div>
 
-				<div className='flex h-10 w-10 items-center justify-center rounded-full bg-white'>
-					{isPlaying && <Pause className='text-brand h-4 w-4' />}
-				</div>
+				<button onClick={handlePlayClick} className='flex h-10 w-10 items-center justify-center rounded-full bg-white transition-opacity hover:opacity-80'>
+					{isPlaying ? <Pause className='text-brand h-4 w-4' /> : <PlaySVG className='text-brand ml-1 h-4 w-4' />}
+				</button>
 			</Card>
 		</HomeDraggableLayer>
 	)
