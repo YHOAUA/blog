@@ -33,6 +33,7 @@ interface MusicState {
 
 interface MusicActions {
 	init: () => Promise<void>
+	refreshPlaylist: () => Promise<void>
 	togglePlay: () => void
 	playNext: () => void
 	playPrev: () => void
@@ -48,6 +49,7 @@ let audio: HTMLAudioElement | null = null
 let shuffleQueue: number[] = []
 let shuffleIndex = 0
 let listenersAttached = false
+let refreshTimer: NodeJS.Timeout | null = null
 
 function getAudio(): HTMLAudioElement {
 	if (!audio) {
@@ -249,11 +251,54 @@ export const useMusicStore = create<MusicStore>((set, get) => {
 						: 0
 					loadTrack(startIndex, false)
 				}
+
+				// 启动定时刷新，每 30 秒更新一次歌单（测试用）
+				if (refreshTimer) clearInterval(refreshTimer)
+				refreshTimer = setInterval(() => {
+					console.log('[Music] 自动刷新歌单...')
+					get().refreshPlaylist()
+				}, 30 * 1000)
 			} catch {
 				set({ playlist: musicConfig.localPlaylist, initialized: true, loading: false, error: '加载歌单失败' })
 				if (musicConfig.localPlaylist.length > 0) {
 					loadTrack(0, false)
 				}
+			}
+		},
+
+		refreshPlaylist: async () => {
+			const { currentIndex, playlist: oldPlaylist, isPlaying } = get()
+			const currentTrack = oldPlaylist[currentIndex]
+
+			console.log('[Music] refreshPlaylist 执行，当前歌单长度:', oldPlaylist.length)
+
+			try {
+				const newPlaylist = await fetchMetingData()
+				console.log('[Music] 拉取到新歌单，长度:', newPlaylist.length)
+				if (newPlaylist.length === 0) return
+
+				// 更新歌单，尽量保持当前播放的歌曲索引
+				let newIndex = currentIndex
+				if (currentTrack) {
+					const foundIndex = newPlaylist.findIndex(
+						track => track.name === currentTrack.name && track.artist === currentTrack.artist
+					)
+					if (foundIndex !== -1) {
+						newIndex = foundIndex
+					} else if (newIndex >= newPlaylist.length) {
+						newIndex = 0
+					}
+				}
+
+				set({ playlist: newPlaylist, currentIndex: newIndex })
+				console.log('[Music] 歌单已更新，新索引:', newIndex)
+
+				// 如果当前歌曲变了，重新加载（但不自动播放）
+				if (newIndex !== currentIndex || newPlaylist[newIndex]?.url !== currentTrack?.url) {
+					loadTrack(newIndex, isPlaying)
+				}
+			} catch (error) {
+				console.error('[Music] 刷新歌单失败:', error)
 			}
 		},
 
