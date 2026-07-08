@@ -1,5 +1,5 @@
 'use client'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect } from 'react'
 import { useCenterInit } from '@/hooks/use-center'
 import BlurredBubblesBackground from './backgrounds/blurred-bubbles'
 import NavCard from '@/components/nav-card'
@@ -10,17 +10,49 @@ import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { ScrollTopButton } from '@/components/scroll-top-button'
 import MusicCard from '@/components/music-card'
 import MusicMiniBar from '@/components/music-mini-bar'
+import { useMusicStore } from '@/app/music/music-store'
 
 export default function Layout({ children }: PropsWithChildren) {
 	useCenterInit()
 	useSizeInit()
 	const { cardStyles, siteContent, regenerateKey } = useConfigStore()
 	const { maxSM, init } = useSize()
+	const { lyrics, currentLrcIndex, isPlaying } = useMusicStore()
 
 	const backgroundImages = (siteContent.backgroundImages ?? []) as Array<{ id: string; url: string }>
 	const currentBackgroundImageId = siteContent.currentBackgroundImageId
 	const currentBackgroundImage =
 		currentBackgroundImageId && currentBackgroundImageId.trim() ? backgroundImages.find(item => item.id === currentBackgroundImageId) : null
+
+	// 歌词标题同步
+	useEffect(() => {
+		const originalTitle = siteContent.meta?.title || '伊霍安'
+
+		if (isPlaying && lyrics.length > 0 && currentLrcIndex >= 0 && currentLrcIndex < lyrics.length) {
+			const currentLyric = lyrics[currentLrcIndex].text
+
+			// 提取括号内的中文翻译：原文 (翻译)
+			const translationMatch = currentLyric.match(/\(([^)]*[一-龥][^)]*)\)/)
+			if (translationMatch) {
+				const translation = translationMatch[1].trim()
+				document.title = translation
+			}
+			// 如果没有括号，但整行是中文，直接显示
+			else if (/[一-龥]/.test(currentLyric) && currentLyric.trim()) {
+				document.title = currentLyric
+			}
+			// 否则保持原标题
+			else {
+				document.title = originalTitle
+			}
+		} else {
+			document.title = originalTitle
+		}
+
+		return () => {
+			document.title = originalTitle
+		}
+	}, [lyrics, currentLrcIndex, isPlaying, siteContent.meta?.title])
 
 	return (
 		<>

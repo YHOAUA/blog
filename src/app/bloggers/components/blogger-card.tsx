@@ -47,11 +47,21 @@ export function BloggerCard({ blogger, categories, isEditMode = false, onUpdate,
 
 	const canEdit = isEditMode && isEditing
 
+	const handleCardClick = () => {
+		if (!canEdit) {
+			window.open(localBlogger.url, '_blank', 'noopener,noreferrer')
+		}
+	}
+
 	return (
 		<motion.div
 			initial={{ opacity: 0, scale: 0.6 }}
 			{...(maxSM ? { animate: { opacity: 1, scale: 1 } } : { whileInView: { opacity: 1, scale: 1 } })}
-			className='card relative block overflow-hidden'>
+			onClick={handleCardClick}
+			className={cn(
+				'card relative block overflow-hidden transition-all',
+				!canEdit && 'cursor-pointer hover:shadow-lg hover:scale-[1.02]'
+			)}>
 			{isEditMode && (
 				<div className='absolute top-3 right-3 z-10 flex gap-2'>
 					{isEditing ? (
@@ -76,7 +86,7 @@ export function BloggerCard({ blogger, categories, isEditMode = false, onUpdate,
 				</div>
 			)}
 
-			<div>
+			<div onClick={e => canEdit && e.stopPropagation()}>
 				<div className='mb-4 flex items-center gap-4'>
 					<div className='group relative'>
 						<img
@@ -108,13 +118,9 @@ export function BloggerCard({ blogger, categories, isEditMode = false, onUpdate,
 								{localBlogger.url}
 							</div>
 						) : (
-							<a
-								href={localBlogger.url}
-								target='_blank'
-								rel='noopener noreferrer'
-								className='text-secondary hover:text-brand mt-1 block max-w-[200px] truncate text-xs hover:underline'>
+							<div className='text-secondary mt-1 block max-w-[200px] truncate text-xs'>
 								{localBlogger.url}
-							</a>
+							</div>
 						)}
 					</div>
 				</div>
@@ -155,7 +161,7 @@ export function BloggerCard({ blogger, categories, isEditMode = false, onUpdate,
 					onBlur={e => handleFieldChange('description', e.currentTarget.textContent || '')}
 					onClick={e => {
 						if (!canEdit) {
-							e.preventDefault()
+							e.stopPropagation()
 							setExpanded(!expanded)
 						}
 					}}
