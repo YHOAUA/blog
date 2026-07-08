@@ -1,7 +1,10 @@
 /**
  * [INPUT]: 依赖 zustand 的 create，依赖 ./music-config 的配置和类型
- * [OUTPUT]: 对外提供 useMusicStore hook
- * [POS]: music 模块的全局状态管理，被 MusicCard 和全屏播放页面共享
+ * [OUTPUT]: 对外提供 useMusicStore hook（playlist / currentIndex / isPlaying / progress / lyrics 等）
+ * [POS]: music 模块的全局状态管理，被 MusicCard、MusicMiniBar 和全屏播放页面共享
+ * [NOTE]: audio 为全局单例，监听器在 store 创建时一次性挂载；
+ *         isPlaying 由 audio 的 play/pause 事件统一驱动，禁手动散乱 setState；
+ *         loadTrack 对同一 url 幂等，避免路由切换打断当前播放
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 
@@ -44,9 +47,11 @@ interface MusicActions {
 
 type MusicStore = MusicState & MusicActions
 
+// audio 是全局单例，与 store 创建时机解耦，整页生命周期只持有一份
 let audio: HTMLAudioElement | null = null
 let shuffleQueue: number[] = []
 let shuffleIndex = 0
+// 监听器只挂一次：audio 全局单例为其私有资产，挂载与 React mount/unmount 无关
 let listenersAttached = false
 
 function getAudio(): HTMLAudioElement {
@@ -56,6 +61,15 @@ function getAudio(): HTMLAudioElement {
 		audio.volume = musicConfig.volume
 	}
 	return audio
+}
+
+// 规范化 url 用于幕等比较，避免相对/绝对路径假阴性
+function normalizeUrl(url: string): string {
+	try {
+		return new URL(url, window.location.href).href
+	} catch {
+		return url
+	}
 }
 
 function parseLRC(lrc: string): LyricLine[] {
@@ -140,74 +154,94 @@ async function loadLyrics(track: MusicTrack): Promise<LyricLine[]> {
 	return parseLRC(track.lrc)
 }
 
-export const useMusicStore = create<MusicStore>((set, get) => {
-	function loadTrack(index: number, autoPlay: boolean) {
-		const { playlist } = get()
-		if (index < 0 || index >= playlist.length) return
+// 载入指定曲目为当前播放：幕等保护同一 url 不重赋 src，避免路由切换把正在播的歌打回起点
+function loadTrack(index: number, autoPlay: boolean) {
+	const { playlist } = useMusicStore.getState()
+	if (index < 0 || index >= playlist.length) return
 
-		const track = playlist[index]
-		const a = getAudio()
+	const track = playlist[index]
+	const a = getAudio()
 
-		a.src = track.url
-		set({ currentIndex: index, progress: 0, currentTime: 0, duration: 0, currentLrcIndex: -1 })
-
-		loadLyrics(track).then(lyrics => set({ lyrics }))
-
-		if (autoPlay) {
-			a.play().then(() => set({ isPlaying: true })).catch(() => {})
+	if (a.src && normalizeUrl(a.src) === normalizeUrl(track.url)) {
+		// 同一首：仅对齐 index，进度与歌词保持现状，不破坏播放
+		useMusicStore.setState({ currentIndex: index })
+		if (autoPlay && a.paused) {
+			a.play().then(() => useMusicStore.setState({ isPlaying: true })).catch(() => {})
 		}
+		return
 	}
 
-	function setupAudioListeners() {
-		const a = getAudio()
+	a.src = track.url
+	a.load()
+	useMusicStore.setState({ currentIndex: index, progress: 0, currentTime: 0, duration: 0, currentLrcIndex: -1 })
 
-		a.addEventListener('timeupdate', () => {
-			if (isNaN(a.duration)) return
-			const currentTime = a.currentTime
-			const duration = a.duration
-			const progress = (currentTime / duration) * 100
+	loadLyrics(track).then(lyrics => useMusicStore.setState({ lyrics }))
 
-			const { lyrics, currentLrcIndex } = get()
-			let newLrcIndex = -1
-			for (let i = 0; i < lyrics.length; i++) {
-				if (currentTime >= lyrics[i].time) newLrcIndex = i
-				else break
-			}
-
-			if (newLrcIndex !== currentLrcIndex) {
-				set({ currentTime, duration, progress, currentLrcIndex: newLrcIndex })
-			} else {
-				set({ currentTime, duration, progress })
-			}
-		})
-
-		a.addEventListener('ended', () => {
-			const { playMode, currentIndex, playlist } = get()
-			if (playMode === 'one') {
-				a.currentTime = 0
-				a.play()
-				return
-			}
-
-			let nextIndex: number
-			if (playMode === 'random') {
-				if (shuffleQueue.length === 0 || shuffleIndex >= shuffleQueue.length) {
-					shuffleQueue = generateShuffleQueue(playlist.length, currentIndex)
-					shuffleIndex = 0
-				}
-				nextIndex = shuffleQueue[shuffleIndex++]
-			} else {
-				nextIndex = (currentIndex + 1) % playlist.length
-			}
-			loadTrack(nextIndex, true)
-		})
-
-		a.addEventListener('loadedmetadata', () => {
-			set({ duration: a.duration })
-		})
+	if (autoPlay) {
+		a.play().then(() => useMusicStore.setState({ isPlaying: true })).catch(() => {})
 	}
+}
 
-	let listenersAttached = false
+// 为 audio 单例挂载事件监听器，与 store 状态同步；只挂一次，整页生命周期复用
+function setupAudioListeners() {
+	const a = getAudio()
+
+	a.addEventListener('timeupdate', () => {
+		if (isNaN(a.duration)) return
+		const currentTime = a.currentTime
+		const duration = a.duration
+		const progress = (currentTime / duration) * 100
+
+		const { lyrics, currentLrcIndex } = useMusicStore.getState()
+		let newLrcIndex = -1
+		for (let i = 0; i < lyrics.length; i++) {
+			if (currentTime >= lyrics[i].time) newLrcIndex = i
+			else break
+		}
+
+		if (newLrcIndex !== currentLrcIndex) {
+			useMusicStore.setState({ currentTime, duration, progress, currentLrcIndex: newLrcIndex })
+		} else {
+			useMusicStore.setState({ currentTime, duration, progress })
+		}
+	})
+
+	a.addEventListener('ended', () => {
+		const { playMode, currentIndex, playlist } = useMusicStore.getState()
+		if (playMode === 'one') {
+			a.currentTime = 0
+			a.play()
+			return
+		}
+
+		let nextIndex: number
+		if (playMode === 'random') {
+			if (shuffleQueue.length === 0 || shuffleIndex >= shuffleQueue.length) {
+				shuffleQueue = generateShuffleQueue(playlist.length, currentIndex)
+				shuffleIndex = 0
+			}
+			nextIndex = shuffleQueue[shuffleIndex++]
+		} else {
+			nextIndex = (currentIndex + 1) % playlist.length
+		}
+		loadTrack(nextIndex, true)
+	})
+
+	a.addEventListener('loadedmetadata', () => {
+		useMusicStore.setState({ duration: a.duration })
+	})
+
+	// isPlaying 由 audio 的 play/pause 事件统一驱动，移除手动 setState 的散乱
+	a.addEventListener('play', () => useMusicStore.setState({ isPlaying: true }))
+	a.addEventListener('pause', () => useMusicStore.setState({ isPlaying: false }))
+}
+
+export const useMusicStore = create<MusicStore>((set, get) => {
+	// store 创建即挂载监听器一次：audio 全局单例先于组件就绪，监听器与其同生共死
+	if (typeof window !== 'undefined' && !listenersAttached) {
+		setupAudioListeners()
+		listenersAttached = true
+	}
 
 	return {
 		playlist: [],
@@ -228,11 +262,6 @@ export const useMusicStore = create<MusicStore>((set, get) => {
 			const { initialized, loading } = get()
 			if (initialized || loading) return
 
-			if (!listenersAttached) {
-				setupAudioListeners()
-				listenersAttached = true
-			}
-
 			set({ loading: true })
 
 			try {
@@ -244,10 +273,25 @@ export const useMusicStore = create<MusicStore>((set, get) => {
 				set({ playlist, initialized: true, loading: false })
 
 				if (playlist.length > 0) {
-					const startIndex = musicConfig.playMode === 'random'
-						? Math.floor(Math.random() * playlist.length)
-						: 0
-					loadTrack(startIndex, false)
+					// 若 audio 当前已在播放某曲目，且新歌单中仍含该曲目，
+					// 仅修正 currentIndex 使其与新歌单对齐，不打断当前播放
+					const a = getAudio()
+					let startIndex = -1
+					if (a.src) {
+						const currentHref = normalizeUrl(a.src)
+						startIndex = playlist.findIndex(t => normalizeUrl(t.url) === currentHref)
+					}
+
+					if (startIndex === -1) {
+						startIndex = musicConfig.playMode === 'random'
+							? Math.floor(Math.random() * playlist.length)
+							: 0
+						loadTrack(startIndex, false)
+					} else {
+						set({ currentIndex: startIndex })
+						// 歌词可能在首次 init 时尚未加载，补一次
+						loadLyrics(playlist[startIndex]).then(lyrics => set({ lyrics }))
+					}
 				}
 			} catch {
 				set({ playlist: musicConfig.localPlaylist, initialized: true, loading: false, error: '加载歌单失败' })
@@ -266,11 +310,11 @@ export const useMusicStore = create<MusicStore>((set, get) => {
 				return
 			}
 
+			// isPlaying 改由 play/pause 监听器统一驱动，这里只发指令
 			if (isPlaying) {
 				a.pause()
-				set({ isPlaying: false })
 			} else {
-				a.play().then(() => set({ isPlaying: true })).catch(() => {})
+				a.play().catch(() => {})
 			}
 		},
 

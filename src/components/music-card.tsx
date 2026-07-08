@@ -63,7 +63,7 @@ export default function MusicCard() {
 			x: styles.offsetX !== null ? center.x + styles.offsetX : center.x + CARD_SPACING + hiCardStyles.width / 2 - styles.offset,
 			y: styles.offsetY !== null ? center.y + styles.offsetY : center.y - clockCardStyles.offset + CARD_SPACING + calendarCardStyles.height + CARD_SPACING
 		}
-	}, [isPlaying, isHomePage, center, styles, hiCardStyles, clockCardStyles, calendarCardStyles])
+	}, [isHomePage, center, styles, hiCardStyles, clockCardStyles, calendarCardStyles])
 
 	const { x, y } = position
 
