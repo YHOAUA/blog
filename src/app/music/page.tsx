@@ -9,7 +9,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ListMusic, Volume2, Music, Play, Pause, SkipBack, SkipForward, Repeat, Repeat1, Shuffle, VolumeX, Minus } from 'lucide-react'
+import { ArrowLeft, ListMusic, Volume2, Music, Play, Pause, SkipBack, SkipForward, Repeat, Repeat1, Shuffle, VolumeX, Minus, Loader2 } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useMusicStore } from './music-store'
 import { ANIMATION_DELAY, INIT_DELAY } from '@/consts'
@@ -71,11 +71,34 @@ export default function MusicPage() {
 				{/* 主播放器卡片 */}
 				<motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: INIT_DELAY + ANIMATION_DELAY }} className='card relative'>
 					{loading && (
-						<div className='absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/60 backdrop-blur-[2px]'>
-							<div className='text-brand h-8 w-8 animate-spin'>
-								<svg className='h-full w-full' viewBox='0 0 24 24' fill='none'>
-									<path d='M12 4V2M12 22v-2M20 12h2M2 12h2M17.66 6.34l1.41-1.41M4.93 19.07l1.41-1.41M6.34 6.34L4.93 4.93M19.07 19.07l-1.41-1.41' stroke='currentColor' strokeWidth='2' strokeLinecap='round' />
-								</svg>
+						<div className='flex flex-col gap-4 p-1'>
+							{/* 顶部：封面 + 信息骨架 */}
+							<div className='mb-2 flex items-center gap-2 px-1'>
+								<div className='h-14 w-14 shrink-0'>
+									<div className='bg-sky-500/10 relative z-10 flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-white shadow-lg'>
+										<Loader2 className='text-sky-500 h-6 w-6 animate-spin' />
+									</div>
+								</div>
+
+								<div className='flex-1 space-y-1.5 overflow-hidden'>
+									<div className='bg-neutral-200/70 h-3.5 w-3/5 animate-pulse rounded-full' />
+									<div className='bg-neutral-200/70 h-2.5 w-2/5 animate-pulse rounded-full' />
+									<div className='bg-neutral-200/50 mt-2 h-1 w-full animate-pulse rounded-full' />
+								</div>
+							</div>
+
+							{/* 进度条骨架 */}
+							<div className='px-1'>
+								<div className='bg-neutral-200/50 mb-2 mt-2 h-1 w-full animate-pulse rounded-full' />
+							</div>
+
+							{/* 控制按钮骨架 */}
+							<div className='flex items-center justify-between px-1'>
+								<div className='bg-neutral-200/50 h-5 w-5 animate-pulse rounded' />
+								<div className='bg-neutral-200/50 h-7 w-7 animate-pulse rounded-full' />
+								<div className='bg-neutral-200/60 h-12 w-12 animate-pulse rounded-full' />
+								<div className='bg-neutral-200/50 h-7 w-7 animate-pulse rounded-full' />
+								<div className='bg-neutral-200/50 h-5 w-5 animate-pulse rounded' />
 							</div>
 						</div>
 					)}
