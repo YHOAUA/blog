@@ -7,20 +7,6 @@
 		"stars": 4
 	},
 	{
-		"name": "BlogFinder",
-		"url": "https://bf.zzxworld.com/",
-		"avatar": "https://bf.zzxworld.com/images/favicon.png",
-		"description": "一个 blog 收集网站",
-		"stars": 3
-	},
-	{
-		"name": "Niracler 的博物志",
-		"url": "https://niracler.com/",
-		"avatar": "https://niracler.com/favicon.svg",
-		"description": "",
-		"stars": 3
-	},
-	{
 		"name": "云风的 BLOG",
 		"avatar": "https://blog.codingnow.com/favicon.ico",
 		"url": "https://blog.codingnow.com/",
