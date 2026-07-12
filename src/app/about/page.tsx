@@ -21,7 +21,7 @@ export default function Page() {
 
 	const { isAuth, setPrivateKey } = useAuthStore()
 	const { siteContent } = useConfigStore()
-	const { content, loading } = useMarkdownRender(data.content)
+	const { content, loading } = useMarkdownRender(data.content, { openLinksInNewTab: true })
 	const hideEditButton = siteContent.hideEditButton ?? false
 
 	const handleChoosePrivateKey = async (file: File) => {
