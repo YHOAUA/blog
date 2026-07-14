@@ -247,7 +247,7 @@ export default function ClockPage() {
 	}
 
 	const phaseLabel = pomodoroPhase === 'focus' ? '专注' : pomodoroPhase === 'shortBreak' ? '短休' : '长休'
-	const phaseColor = pomodoroPhase === 'focus' ? 'text-brand' : pomodoroPhase === 'shortBreak' ? 'text-emerald-500' : 'text-blue-500'
+	const phaseColor = pomodoroPhase === 'focus' ? 'text-brand' : pomodoroPhase === 'shortBreak' ? 'text-brand-secondary' : 'text-secondary'
 
 	return (
 		<div className='flex flex-col items-center px-6 pt-32 pb-12'>
@@ -304,7 +304,7 @@ export default function ClockPage() {
 							onClick={handleNextPhase}
 							className={cn(
 								'rounded-xl px-6 py-3 text-sm font-medium text-white shadow-sm',
-								pomodoroPhase === 'focus' ? 'bg-emerald-500' : 'bg-brand'
+								'bg-brand'
 							)}>
 							{pomodoroPhase === 'focus' ? '开始休息' : '开始专注'}
 						</motion.button>

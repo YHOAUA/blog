@@ -195,7 +195,7 @@ export function SocialButtonsSection({ formData, setFormData, socialButtonImageU
 											placeholder={button.type === 'wechat' ? '微信号或二维码链接' : 'QQ号或二维码链接'}
 											className='bg-secondary/10 flex-1 rounded-lg border px-3 py-1.5 text-xs'
 										/>
-										<button type='button' onClick={() => handleRemoveImage(button.id)} className='text-xs text-red-500 hover:text-red-600'>
+										<button type='button' onClick={() => handleRemoveImage(button.id)} className='text-secondary hover:text-primary text-xs font-medium'>
 											删除图片
 										</button>
 									</div>
@@ -274,7 +274,7 @@ export function SocialButtonsSection({ formData, setFormData, socialButtonImageU
 								className='rounded px-2 py-1 text-xs hover:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-300'>
 								↓
 							</button>
-							<button type='button' onClick={() => handleRemoveButton(button.id)} className='rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50'>
+							<button type='button' onClick={() => handleRemoveButton(button.id)} className='text-secondary hover:text-primary rounded px-2 py-1 text-xs font-medium hover:bg-white/60'>
 								删除
 							</button>
 						</div>

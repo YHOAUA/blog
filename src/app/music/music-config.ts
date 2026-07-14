@@ -1,6 +1,6 @@
 /**
  * [INPUT]: 无外部依赖
- * [OUTPUT]: 对外提供 musicConfig 配置、MusicTrack 类型、METING_APIS 常量
+ * [OUTPUT]: 对外提供 musicConfig、MusicTrack、METING_APIS、upgradeCoverUrl
  * [POS]: music 模块的配置中心，被 music-store 和播放页面消费
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
@@ -11,6 +11,21 @@ export interface MusicTrack {
 	url: string
 	pic: string
 	lrc?: string
+}
+
+/** 网易云等封面常带 ?param=90y90 / 300y300 缩略图；抬到高清 */
+export function upgradeCoverUrl(pic: string): string {
+	if (!pic) return pic
+	const HI = 2000
+	try {
+		const u = new URL(pic, typeof window !== 'undefined' ? window.location.href : 'https://localhost')
+		if (/music\.(126|163)\.net/i.test(u.hostname) || u.searchParams.has('param')) {
+			u.searchParams.set('param', `${HI}y${HI}`)
+		}
+		return u.toString()
+	} catch {
+		return pic.replace(/([?&])param=\d+y\d+/i, `$1param=${HI}y${HI}`)
+	}
 }
 
 export const METING_APIS = [

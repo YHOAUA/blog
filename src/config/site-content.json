@@ -10,14 +10,14 @@
 		"colorSecondary": "#8b7667",
 		"colorBrandSecondary": "#eec25e",
 		"colorBg": "#d4e8f3",
-		"colorBorder": "#ffffff",
-		"colorCard": "#ffffff99",
-		"colorArticle": "#ffffffcc"
+		"colorBorder": "#ffffff55",
+		"colorCard": "#f7fbfc88",
+		"colorArticle": "#f7fbfccc"
 	},
 	"backgroundColors": [
 		"#f7da3987",
 		"#8fdbe9",
-		"#fffef8"
+		"#e8f4f8"
 	],
 	"artImages": [
 		{

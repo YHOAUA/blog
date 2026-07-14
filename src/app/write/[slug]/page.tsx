@@ -24,7 +24,7 @@ export default function EditBlogPage() {
 	}
 
 	if (!slug) {
-		return <div className='flex h-screen items-center justify-center text-sm text-red-500'>无效的博客 ID</div>
+		return <div className='text-secondary flex h-screen items-center justify-center text-sm'>无效的博客 ID</div>
 	}
 
 	return isPreview ? (

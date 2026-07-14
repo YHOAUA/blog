@@ -26,11 +26,11 @@ export default function PlayerControls({ isPlaying, playMode, onTogglePlay, onNe
 
 	return (
 		<div className='flex items-center justify-center gap-6'>
-			<button onClick={onCycleMode} className='text-secondary transition-all hover:scale-110 hover:text-black' title={modeLabel}>
+			<button onClick={onCycleMode} className='text-secondary transition-all hover:scale-110 hover:text-primary' title={modeLabel}>
 				<ModeIcon className='h-5 w-5' />
 			</button>
 
-			<button onClick={onPrev} className='text-secondary transition-all hover:scale-110 hover:text-black'>
+			<button onClick={onPrev} className='text-secondary transition-all hover:scale-110 hover:text-primary'>
 				<SkipBack className='h-7 w-7' fill='currentColor' />
 			</button>
 
@@ -40,7 +40,7 @@ export default function PlayerControls({ isPlaying, playMode, onTogglePlay, onNe
 				{isPlaying ? <Pause className='h-6 w-6 text-white' fill='white' /> : <Play className='ml-0.5 h-6 w-6 text-white' fill='white' />}
 			</button>
 
-			<button onClick={onNext} className='text-secondary transition-all hover:scale-110 hover:text-black'>
+			<button onClick={onNext} className='text-secondary transition-all hover:scale-110 hover:text-primary'>
 				<SkipForward className='h-7 w-7' fill='currentColor' />
 			</button>
 

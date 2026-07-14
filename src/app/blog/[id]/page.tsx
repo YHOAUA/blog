@@ -61,7 +61,7 @@ export default function Page() {
 	}
 
 	if (error) {
-		return <div className='flex h-full items-center justify-center text-sm text-red-500'>{error}</div>
+		return <div className='text-secondary flex h-full items-center justify-center text-sm'>{error}</div>
 	}
 
 	if (!blog) {

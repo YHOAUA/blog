@@ -9,7 +9,7 @@
  */
 
 import { create } from 'zustand'
-import { musicConfig, METING_APIS, type MusicTrack } from './music-config'
+import { musicConfig, METING_APIS, upgradeCoverUrl, type MusicTrack } from './music-config'
 
 type PlayMode = 'list' | 'one' | 'random'
 
@@ -125,7 +125,7 @@ async function fetchMetingData(): Promise<MusicTrack[]> {
 					name: item.title || item.name || 'Unknown',
 					artist: item.author || item.artist || 'Unknown',
 					url: item.url,
-					pic: item.pic || item.cover || '',
+					pic: upgradeCoverUrl(item.pic || item.cover || ''),
 					lrc: item.lrc || ''
 				}))
 			}

@@ -60,7 +60,7 @@ export default function CalendarCard() {
 						const day = index + 1
 						const isToday = day === currentDate
 						return (
-							<li key={day} className={cn('flex items-center justify-center rounded-lg', isToday && 'bg-linear border font-medium')}>
+							<li key={day} className={cn('flex items-center justify-center rounded-lg', isToday && 'bg-brand text-white font-medium')}>
 								{day}
 							</li>
 						)

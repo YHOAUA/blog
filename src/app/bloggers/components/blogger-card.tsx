@@ -69,16 +69,16 @@ export function BloggerCard({ blogger, categories, isEditMode = false, onUpdate,
 							<button onClick={handleCancel} className='rounded-lg px-2 py-1.5 text-xs text-gray-400 transition-colors hover:text-gray-600'>
 								取消
 							</button>
-							<button onClick={() => setIsEditing(false)} className='rounded-lg px-2 py-1.5 text-xs text-blue-400 transition-colors hover:text-blue-600'>
+							<button onClick={() => setIsEditing(false)} className='text-brand hover:text-brand/80 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors'>
 								完成
 							</button>
 						</>
 					) : (
 						<>
-							<button onClick={() => setIsEditing(true)} className='rounded-lg px-2 py-1.5 text-xs text-blue-400 transition-colors hover:text-blue-600'>
+							<button onClick={() => setIsEditing(true)} className='text-brand hover:text-brand/80 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors'>
 								编辑
 							</button>
-							<button onClick={onDelete} className='rounded-lg px-2 py-1.5 text-xs text-red-400 transition-colors hover:text-red-600'>
+							<button onClick={onDelete} className='text-secondary hover:text-primary rounded-lg px-2 py-1.5 text-xs font-medium transition-colors'>
 								删除
 							</button>
 						</>

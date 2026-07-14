@@ -42,18 +42,19 @@ export default function LyricsPanel({ lyrics, currentIndex }: LyricsPanelProps) 
 	}
 
 	return (
-		<div ref={containerRef} className='custom-scrollbar relative h-64 overflow-y-auto px-4 sm:h-80'>
-			<div className='pointer-events-none absolute inset-x-0 top-0 z-10 h-12 bg-gradient-to-b from-white to-transparent' />
-			<div className='pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-gradient-to-t from-white to-transparent' />
+		<div ref={containerRef} className='custom-scrollbar relative h-64 overflow-y-auto px-4 sm:h-72'>
+			{/* 遮罩用透明，避免硬白边 */}
+			<div className='from-card pointer-events-none absolute inset-x-0 top-0 z-10 h-14 bg-gradient-to-b to-transparent' />
+			<div className='from-card pointer-events-none absolute inset-x-0 bottom-0 z-10 h-14 bg-gradient-to-t to-transparent' />
 
-			<div className='flex flex-col items-center gap-4 py-24'>
+			<div className='flex flex-col items-center gap-5 py-20'>
 				{lyrics.map((line, i) => (
 					<div
 						key={`${line.time}-${i}`}
 						ref={i === currentIndex ? activeRef : undefined}
 						className={clsx(
-							'text-center transition-all duration-500',
-							i === currentIndex ? 'scale-105 text-base font-semibold text-black' : 'text-secondary text-sm'
+							'max-w-[28ch] text-center transition-all duration-500',
+							i === currentIndex ? 'text-primary scale-[1.04] text-base font-semibold' : 'text-secondary text-sm'
 						)}>
 						{line.text}
 					</div>

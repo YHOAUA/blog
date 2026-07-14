@@ -23,7 +23,7 @@ export default function PlaylistDrawer({ open, playlist, currentIndex, onClose, 
 	return (
 		<div
 			className={clsx(
-				'fixed inset-y-0 right-0 z-50 w-80 transform bg-white shadow-2xl transition-transform duration-300 sm:w-96',
+				'fixed inset-y-0 right-0 z-50 w-80 transform border-l bg-card/95 shadow-xl backdrop-blur-md transition-transform duration-300 sm:w-96',
 				open ? 'translate-x-0' : 'translate-x-full'
 			)}>
 			<div className='flex items-center justify-between border-b border-slate-200 px-5 py-4'>
@@ -39,7 +39,7 @@ export default function PlaylistDrawer({ open, playlist, currentIndex, onClose, 
 						key={`${track.url}-${i}`}
 						onClick={() => onSelect(i)}
 						className={clsx(
-							'flex w-full items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-slate-50',
+							'flex w-full items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-black/5',
 							i === currentIndex && 'bg-brand/5'
 						)}>
 						<div className='bg-brand/5 flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-md'>
@@ -51,7 +51,7 @@ export default function PlaylistDrawer({ open, playlist, currentIndex, onClose, 
 						</div>
 
 						<div className='min-w-0 flex-1'>
-							<div className={clsx('truncate text-sm', i === currentIndex ? 'text-brand font-medium' : 'text-black')}>
+							<div className={clsx('truncate text-sm', i === currentIndex ? 'text-brand font-medium' : 'text-primary')}>
 								{track.name}
 							</div>
 							<div className='text-secondary truncate text-xs'>{track.artist}</div>

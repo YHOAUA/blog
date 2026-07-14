@@ -38,7 +38,7 @@ export default function MusicMiniBar() {
 			className='fixed bottom-4 left-3 right-3 z-50 flex items-center gap-3 rounded-2xl bg-white/80 px-4 py-2.5 shadow-lg ring-1 ring-black/5 backdrop-blur-xl'
 			onClick={() => router.push('/music')}>
 			{/* 封面 */}
-			<div className='flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-sky-50'>
+			<div className='flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand/10'>
 				{currentTrack?.pic ? (
 					<img
 						src={currentTrack.pic}
@@ -47,7 +47,7 @@ export default function MusicMiniBar() {
 						style={{ animationDuration: '20s', animationTimingFunction: 'linear' }}
 					/>
 				) : (
-					<Music className='h-4 w-4 text-sky-400' />
+					<Music className='h-4 w-4 text-brand' />
 				)}
 			</div>
 
@@ -55,14 +55,14 @@ export default function MusicMiniBar() {
 			<div className='min-w-0 flex-1'>
 				<div className='truncate text-xs font-medium text-neutral-700'>{currentTrack?.name || 'Music'}</div>
 				<div className='mt-1 h-1 rounded-full bg-neutral-200'>
-					<div className='h-full rounded-full bg-sky-400 transition-all duration-300' style={{ width: `${progress}%` }} />
+					<div className='h-full rounded-full bg-brand transition-all duration-300' style={{ width: `${progress}%` }} />
 				</div>
 			</div>
 
 			{/* 播放/暂停 */}
 			<button
 				onClick={handlePlayClick}
-				className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sky-500 text-white shadow-sm active:scale-95'>
+				className='bg-brand flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white shadow-sm active:scale-95'>
 				{isPlaying ? <Pause className='h-3.5 w-3.5' /> : <Play className='ml-0.5 h-3.5 w-3.5' />}
 			</button>
 		</div>

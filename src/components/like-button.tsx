@@ -67,7 +67,7 @@ export default function LikeButton({ slug = 'yysuni', delay, className }: LikeBu
 			const url = `${ENDPOINT}?slug=${encodeURIComponent(slug)}`
 			const res = await fetch(url, { method: 'POST' })
 			const data = await res.json().catch(() => ({}))
-			if (data.reason == 'rate_limited') toast('谢谢啦😘，今天已经不能再点赞啦💕')
+			if (data.reason == 'rate_limited') toast('谢谢，今天已经不能再点赞了')
 			const value = typeof data?.count === 'number' ? data.count : (fetchedCount ?? 0) + 1
 			await mutate(value, { revalidate: false })
 		} catch {

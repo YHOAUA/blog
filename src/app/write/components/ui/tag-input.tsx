@@ -24,7 +24,7 @@ export function TagInput({ tags, onChange }: TagInputProps) {
 			{tags.length > 0 && (
 				<div className='mb-2 flex flex-wrap gap-2'>
 					{tags.map((tag, index) => (
-						<span key={index} className='flex items-center gap-1.5 rounded-md bg-blue-100 px-2 py-1 text-sm text-blue-700'>
+						<span key={index} className='bg-brand/10 text-brand flex items-center gap-1.5 rounded-md px-2 py-1 text-sm'>
 							#{tag}
 							<button type='button' onClick={() => handleRemoveTag(index)} className='text-secondary'>
 								×

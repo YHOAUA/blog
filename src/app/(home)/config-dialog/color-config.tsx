@@ -28,9 +28,9 @@ const COLOR_PRESETS: ColorPreset[] = [
 			colorPrimary: '#334f52',
 			colorSecondary: '#7b888e',
 			colorBg: '#eeeeee',
-			colorBorder: '#ffffff',
-			colorCard: '#ffffff66',
-			colorArticle: '#ffffffcc'
+			colorBorder: '#ffffff55',
+			colorCard: '#f4f8f866',
+			colorArticle: '#f4f8f8cc'
 		},
 		backgroundColors: ['#EDDD62', '#9EE7D1', '#84D68A', '#EDDD62', '#88E6E5', '#a7f3d0']
 	},
@@ -51,9 +51,11 @@ const COLOR_PRESETS: ColorPreset[] = [
 			colorSecondary: '#8b7667',
 			colorBrandSecondary: '#eec25e',
 			colorBg: '#d4e8f3',
-			colorCard: '#ffffff99',
+			colorCard: '#f7fbfc88',
+				colorBorder: '#ffffff55',
+				colorArticle: '#f7fbfccc'
 		},
-		backgroundColors: ['#f7da3987', '#8fdbe9', '#fffef8']
+		backgroundColors: ['#f7da3987', '#8fdbe9', '#e8f4f8']
 	},
 	{
 		name: '深夜',

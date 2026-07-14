@@ -77,7 +77,7 @@ export default function ProgressBar({ progress, currentTime, duration, onSeek }:
 		<div className='w-full px-2'>
 			<div
 				ref={barRef}
-				className='group relative h-1.5 cursor-pointer rounded-full bg-slate-200 transition-all hover:h-2'
+				className='group relative h-1.5 cursor-pointer rounded-full bg-black/10 transition-all hover:h-2'
 				onMouseDown={handleMouseDown}
 				onTouchStart={handleTouchStart}>
 				<div className='bg-brand absolute inset-y-0 left-0 rounded-full transition-[width] duration-100' style={{ width: `${progress}%` }} />

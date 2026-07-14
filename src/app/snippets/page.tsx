@@ -195,7 +195,7 @@ export default function Page() {
 						{draftSnippets.map((item, index) => (
 							<div key={`${item}-${index}`} className='group flex items-start gap-3 rounded-lg px-3 py-2 text-sm'>
 								<p className='flex-1 leading-relaxed text-gray-800'>{item}</p>
-								<button onClick={() => handleRemoveDraft(index)} className='text-gray-400 transition-colors hover:text-red-500'>
+								<button onClick={() => handleRemoveDraft(index)} className='text-secondary hover:text-primary transition-colors'>
 									<X className='h-4 w-4' />
 								</button>
 							</div>

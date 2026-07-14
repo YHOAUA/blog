@@ -81,16 +81,16 @@ export function ShareCard({ share, isEditMode = false, onUpdate, onDelete }: Sha
 							<button onClick={e => { e.stopPropagation(); handleCancel(); }} className='rounded-lg px-2 py-1.5 text-xs text-gray-400 transition-colors hover:text-gray-600'>
 								取消
 							</button>
-							<button onClick={e => { e.stopPropagation(); setIsEditing(false); }} className='rounded-lg px-2 py-1.5 text-xs text-blue-400 transition-colors hover:text-blue-600'>
+							<button onClick={e => { e.stopPropagation(); setIsEditing(false); }} className='text-brand hover:text-brand/80 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors'>
 								完成
 							</button>
 						</>
 					) : (
 						<>
-							<button onClick={e => { e.stopPropagation(); setIsEditing(true); }} className='rounded-lg px-2 py-1.5 text-xs text-blue-400 transition-colors hover:text-blue-600'>
+							<button onClick={e => { e.stopPropagation(); setIsEditing(true); }} className='text-brand hover:text-brand/80 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors'>
 								编辑
 							</button>
-							<button onClick={e => { e.stopPropagation(); onDelete?.(); }} className='rounded-lg px-2 py-1.5 text-xs text-red-400 transition-colors hover:text-red-600'>
+							<button onClick={e => { e.stopPropagation(); onDelete?.(); }} className='text-secondary hover:text-primary rounded-lg px-2 py-1.5 text-xs font-medium transition-colors'>
 								删除
 							</button>
 						</>
@@ -135,7 +135,7 @@ export function ShareCard({ share, isEditMode = false, onUpdate, onDelete }: Sha
 								target='_blank'
 								rel='noopener noreferrer'
 								onClick={e => e.stopPropagation()}
-								className='text-secondary hover:text-sky-500 mt-1 block max-w-[200px] truncate text-xs hover:underline'>
+								className='text-secondary hover:text-brand mt-1 block max-w-[200px] truncate text-xs hover:underline'>
 								{localShare.url}
 							</a>
 						)}

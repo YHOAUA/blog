@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from 'react'
 import { motion } from 'motion/react'
+import { ImagePlus } from 'lucide-react'
 import { ANIMATION_DELAY, INIT_DELAY } from '@/consts'
 import { DialogModal } from '@/components/dialog-modal'
 
@@ -319,8 +320,8 @@ export default function Page() {
 						isDragging ? 'border-brand bg-white' : ''
 					}`}>
 					<input type='file' accept='image/*' multiple className='hidden' onChange={event => handleFiles(event.target.files)} />
-					<div className='bg-brand/10 text-brand/60 group-hover:bg-brand/10 flex h-20 w-20 items-center justify-center rounded-full text-3xl transition'>
-						📷
+					<div className='bg-brand/10 text-brand group-hover:bg-brand/15 flex h-20 w-20 items-center justify-center rounded-full transition'>
+						<ImagePlus className='h-8 w-8' strokeWidth={1.5} />
 					</div>
 					<div>
 						<p className='text-base font-medium'>点击或拖拽图片</p>
@@ -372,7 +373,7 @@ export default function Page() {
 											) : null}
 											<button
 												onClick={() => handleRemoveImage(index)}
-												className='rounded-full border border-red-200 px-3 py-1 font-medium text-rose-400 transition hover:bg-rose-50'>
+												className='text-secondary hover:text-primary rounded-full border px-3 py-1 font-medium transition hover:bg-white/80'>
 												移除
 											</button>
 										</div>

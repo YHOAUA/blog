@@ -246,7 +246,7 @@ export default function Page() {
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
 							onClick={() => router.push('/image-toolbox')}
-							className='rounded-xl border bg-blue-50 px-4 py-2 text-sm text-blue-700'>
+							className='bg-card rounded-xl border px-4 py-2 text-sm transition-colors hover:bg-white/80'>
 							压缩工具
 						</motion.button>
 						<motion.button
